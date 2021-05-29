@@ -14,6 +14,7 @@
 
 #include "plasmacamera.h"
 #include "camerasettings.h"
+#include "camerautils.h"
 
 #ifdef Q_OS_ANDROID
 #include <QtAndroid>
@@ -25,10 +26,11 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 {
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication app(argc, argv);
+    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
     QCoreApplication::setOrganizationName("KDE");
     QCoreApplication::setOrganizationDomain("kde.org");
-    QCoreApplication::setApplicationName("plasma-camera");
-    QGuiApplication::setApplicationDisplayName("Plasma Camera");
+    QCoreApplication::setApplicationName("camera");
+    QGuiApplication::setApplicationDisplayName("Camera");
     QGuiApplication::setWindowIcon(QIcon::fromTheme(QStringLiteral("camera-photo")));
 
     KAboutData about(app.applicationName(), app.applicationDisplayName(), app.applicationVersion(), QString(),
@@ -48,6 +50,8 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 
     PlasmaCamera plasmaCamera;
     plasmaCamera.setAboutData(about);
+
+
     qmlRegisterSingletonInstance<PlasmaCamera>(URI, 1, 0, "PlasmaCamera", &plasmaCamera);
     qmlRegisterSingletonInstance<CameraSettings>(URI, 1, 0, "CameraSettings", CameraSettings::self());
 
@@ -56,6 +60,9 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     });
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
+    engine.rootContext()->setContextProperty("CameraUtils",CameraUtils::instance());
+
+
 
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
 

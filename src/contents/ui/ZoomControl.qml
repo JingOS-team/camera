@@ -1,3 +1,5 @@
+
+
 /****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
@@ -37,83 +39,150 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
-
 import QtQuick 2.0
-import org.kde.kirigami 2.0 as Kirigami
+import org.kde.kirigami 2.15 as Kirigami
 import QtMultimedia 5.0
+import QtQuick.Controls 2.15
 
 Item {
-    id : zoomControl
+    id: zoomControl
+
     property real currentZoom: 1
     property real maximumZoom: 1
+    property real minimumZoom: 1
+    property int minCircle: 23 * appScaleSize
+
     signal zoomTo(real value)
 
-    visible: zoomControl.maximumZoom > 1
-
-    MouseArea {
-        id : mouseArea
-        anchors.fill: parent
-
-        property real initialZoom: 0
-        property real initialPos: 0
-
-        onPressed: {
-            initialPos = mouseY
-            initialZoom = zoomControl.currentZoom
-        }
-
-        onPositionChanged: {
-            if (pressed) {
-                var target = initialZoom * Math.pow(5, (initialPos-mouseY)/zoomControl.height);
-                target = Math.max(1, Math.min(target, zoomControl.maximumZoom))
-                zoomControl.zoomTo(target)
-            }
+    //    visible: zoomControl.maximumZoom > 1
+    onVisibleChanged: {
+        if (visible && !hideTimer.running) {
+            hideTimer.start()
         }
     }
 
-    Item {
-        id : bar
-        x : 16
-        y : parent.height/4
-        width : 24
-        height : parent.height/2
+    function managerTimer(isStop) {
+        if (hideTimer.running & isStop) {
+            hideTimer.stop()
+        } else {
+            hideTimer.start()
+        }
+    }
 
-        Rectangle {
-            anchors.fill: parent
+    Timer {
+        id: hideTimer
+        interval: 4000
+        onTriggered: visible = false
+    }
 
-            smooth: true
-            radius: 8
-            border.color: "white"
-            border.width: 2
-            color: "black"
-            opacity: 0.3
+    Rectangle {
+        id: maxTip
+        width: minCircle
+        height: width
+        color: "transparent"
+        anchors {
+            bottom: sliderView.top
+            bottomMargin: 10 * appScaleSize //root.height * 20/root.defaultHeight
+            horizontalCenter: parent.horizontalCenter
         }
 
-        Rectangle {
-            id: groove
-            x : 0
-            y : parent.height * (1.0 - (zoomControl.currentZoom-1.0) / (zoomControl.maximumZoom-1.0))
-            width: parent.width
-            height: parent.height - y
-            smooth: true
-            radius: Kirigami.Units.gridUnit * 0.5
-            color: "white"
-            opacity: 0.5
+        BlurBackgroundView {
+            id: maxTipBlurBackground
+            anchors.fill: parent
+            blurSourceView: viewfinder
+            parentView: zoomControl
+            blurX: maxTip.x
+            blurY: maxTip.y
         }
 
         Text {
-            id: zoomText
-            anchors {
-                right: bar.left
-                rightMargin: Kirigami.Units.gridUnit * 1
-            }
-            y: Math.min(parent.height - height, Math.max(0, groove.y - height / 2))
-            text: "x" + Math.round(zoomControl.currentZoom * 100) / 100
-            font.bold: true
+            id: maxText
+            anchors.centerIn: parent
+            text: qsTr("10X")
+            font.pixelSize: defaultFontSize - 4 //root.defaultFontSize-3
             color: "white"
-            style: Text.Raised; styleColor: "black"
-            opacity: 0.85
-            font.pixelSize: Kirigami.Units.gridUnit
+        }
+    }
+
+    Slider {
+        id: sliderView
+
+        property int playPosition
+
+        anchors {
+            verticalCenter: parent.verticalCenter
+            left: parent.left
+            margins: 0
+        }
+        width: zoomControl.width
+        height: zoomControl.height / 3
+        //        rotation: 270
+        orientation: Qt.Vertical
+        from: minimumZoom
+        to: maximumZoom
+        value: currentZoom
+        background: Rectangle {
+            width: implicitWidth
+            height: sliderView.availableHeight
+            x: sliderView.leftPadding + sliderView.availableWidth / 2 - width / 2
+            y: sliderView.topPadding + sliderView.availableHeight / 2 - height / 2
+            implicitWidth: 4 * appScaleSize
+            implicitHeight: parent.height
+            radius: height / 2
+            color: "#66FFFFFF"
+
+            Rectangle {
+                width: parent.width
+                height: (1 - sliderView.visualPosition) * parent.height
+                anchors.bottom: parent.bottom
+                color: "#F2FFFFFF"
+                radius: width / 2
+            }
+        }
+
+        handle: Rectangle {
+            x: sliderView.leftPadding + sliderView.availableWidth / 2 - width / 2
+            y: sliderView.topPadding + sliderView.visualPosition
+               * (sliderView.availableHeight - height)
+            color: "#FFFFFF"
+            border.width: 0
+            implicitWidth: minCircle - 3
+            implicitHeight: minCircle - 3
+            radius: height / 2
+        }
+
+        onMoved: {
+            zoomControl.zoomTo(value)
+        }
+        onHoveredChanged: {
+            managerTimer(hovered)
+        }
+    }
+
+    Rectangle {
+        id: minTip
+        width: minCircle
+        height: width
+        color: "transparent"
+        anchors {
+            top: sliderView.bottom
+            topMargin: 10 * appScaleSize //root.height * 20/root.defaultHeight
+            horizontalCenter: parent.horizontalCenter
+        }
+        BlurBackgroundView {
+            id: miniTipBlurBackground
+            anchors.fill: parent
+            blurSourceView: viewfinder
+            parentView: zoomControl
+            blurX: minTip.x
+            blurY: minTip.y
+        }
+        Text {
+            id: miniText
+            anchors.centerIn: parent
+            text: qsTr("1X")
+            font.pixelSize: defaultFontSize - 4 //root.defaultFontSize-3
+            color: "white"
         }
     }
 }

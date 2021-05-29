@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component type="desktop-application">
-  <id>org.kde.plasma.camera</id>
-  <name>Plasma Camera</name>
-  <name xml:lang="az">Plasma Kamera</name>
-  <name xml:lang="ca">Càmera del Plasma</name>
-  <name xml:lang="ca-valencia">Càmera del Plasma</name>
-  <name xml:lang="da">Plasma Kamera</name>
-  <name xml:lang="el">Plasma Camera</name>
-  <name xml:lang="en-GB">Plasma Camera</name>
+  <id>org.kde.camera</id>
+  <name>Camera</name>
+  <name xml:lang="az">Kamera</name>
+  <name xml:lang="ca">Càmera</name>
+  <name xml:lang="ca-valencia">Càmera</name>
+  <name xml:lang="da">Kamera</name>
+  <name xml:lang="el">Camera</name>
+  <name xml:lang="en-GB">Camera</name>
   <name xml:lang="es">Cámara de Plasma</name>
-  <name xml:lang="et">Plasma kaamera</name>
-  <name xml:lang="eu">Plasma Kamera</name>
-  <name xml:lang="fi">Plasma Camera</name>
+  <name xml:lang="et">kaamera</name>
+  <name xml:lang="eu">Kamera</name>
+  <name xml:lang="fi">Camera</name>
   <name xml:lang="fr">Caméra Plasma</name>
   <name xml:lang="gl">Cámara de Plasma</name>
-  <name xml:lang="hu">Plasma Kamera</name>
-  <name xml:lang="id">Plasma Camera</name>
-  <name xml:lang="it">Plasma Camera</name>
-  <name xml:lang="ko">Plasma 카메라</name>
-  <name xml:lang="nl">Plasma Camera</name>
-  <name xml:lang="nn">Plasma-kamera</name>
+  <name xml:lang="hu">Kamera</name>
+  <name xml:lang="id">Camera</name>
+  <name xml:lang="it">Camera</name>
+  <name xml:lang="ko">카메라</name>
+  <name xml:lang="nl">Camera</name>
+  <name xml:lang="nn">kamera</name>
   <name xml:lang="pa">ਪਲਾਜ਼ਮਾ ਕੈਮਰਾ</name>
   <name xml:lang="pl">Kamera Plazmy</name>
   <name xml:lang="pt">Câmara do Plasma</name>
   <name xml:lang="pt-BR">Câmera do Plasma</name>
-  <name xml:lang="ro">Plasma Camera</name>
+  <name xml:lang="ro">Camera</name>
   <name xml:lang="ru">Камера для Plasma</name>
-  <name xml:lang="sk">Plasma Camera</name>
-  <name xml:lang="sl">Plasma Camera</name>
-  <name xml:lang="sv">Plasma kamera</name>
+  <name xml:lang="sk">Camera</name>
+  <name xml:lang="sl">Camera</name>
+  <name xml:lang="sv">kamera</name>
   <name xml:lang="tg">Камераи Плазма</name>
   <name xml:lang="uk">Фотоапарат Плазми</name>
-  <name xml:lang="x-test">xxPlasma Cameraxx</name>
-  <name xml:lang="zh-TW">Plasma 相機</name>
+  <name xml:lang="x-test">Cameraxx</name>
+  <name xml:lang="zh-TW">相機</name>
+  <name xml:lang="zh-CN">相机</name>
   <summary>Take photos and videos</summary>
   <summary xml:lang="az">Şəkil və Video çəkmək</summary>
   <summary xml:lang="ca">Pren fotos i vídeos</summary>
@@ -66,6 +67,7 @@
   <summary xml:lang="uk">Програма для створення фотографій і відео</summary>
   <summary xml:lang="x-test">xxTake photos and videosxx</summary>
   <summary xml:lang="zh-TW">拍照或錄影</summary>
+  <summary xml:lang="zh-CN">相机</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <developer_name>KDE Community</developer_name>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>org.kde.camera</id>
+  <name>Camera</name>
+  <name xml:lang="az">Kamera</name>
+  <name xml:lang="ca">Càmera</name>
+  <name xml:lang="ca-valencia">Càmera</name>
+  <name xml:lang="da">Kamera</name>
+  <name xml:lang="el">Camera</name>
+  <name xml:lang="en-GB">Camera</name>
+  <name xml:lang="es">Cámara de Plasma</name>
+  <name xml:lang="et">kaamera</name>
+  <name xml:lang="eu">Kamera</name>
+  <name xml:lang="fi">Camera</name>
+  <name xml:lang="fr">Caméra Plasma</name>
+  <name xml:lang="gl">Cámara de Plasma</name>
+  <name xml:lang="hu">Kamera</name>
+  <name xml:lang="id">Camera</name>
+  <name xml:lang="it">Camera</name>
+  <name xml:lang="ko">카메라</name>
+  <name xml:lang="nl">Camera</name>
+  <name xml:lang="nn">kamera</name>
+  <name xml:lang="pa">ਪਲਾਜ਼ਮਾ ਕੈਮਰਾ</name>
+  <name xml:lang="pl">Kamera Plazmy</name>
+  <name xml:lang="pt">Câmara do Plasma</name>
+  <name xml:lang="pt-BR">Câmera do Plasma</name>
+  <name xml:lang="ro">Camera</name>
+  <name xml:lang="ru">Камера для Plasma</name>
+  <name xml:lang="sk">Camera</name>
+  <name xml:lang="sl">Camera</name>
+  <name xml:lang="sv">kamera</name>
+  <name xml:lang="tg">Камераи Плазма</name>
+  <name xml:lang="uk">Фотоапарат Плазми</name>
+  <name xml:lang="x-test">Cameraxx</name>
+  <name xml:lang="zh-TW">相機</name>
+  <name xml:lang="zh-CN">相机</name>
+  <summary>Take photos and videos</summary>
+  <summary xml:lang="az">Şəkil və Video çəkmək</summary>
+  <summary xml:lang="ca">Pren fotos i vídeos</summary>
+  <summary xml:lang="ca-valencia">Pren fotos i vídeos</summary>
+  <summary xml:lang="da">Tag billeder og optag videoer</summary>
+  <summary xml:lang="de">Fotos und Videos aufnehmen</summary>
+  <summary xml:lang="el">Παίρνει φωτογραφίες και βίντεο</summary>
+  <summary xml:lang="en-GB">Take photos and videos</summary>
+  <summary xml:lang="es">Realizar fotos y vídeos</summary>
+  <summary xml:lang="et">Fotode ja videode tegemine</summary>
+  <summary xml:lang="eu">Egin argazkiak eta bideoak</summary>
+  <summary xml:lang="fi">Kuvaa valokuvia ja videoita</summary>
+  <summary xml:lang="fr">Prendre des photos et des vidéos</summary>
+  <summary xml:lang="gl">Sacar fotos e gravar vídeos</summary>
+  <summary xml:lang="hu">Fényképek és videók készítése</summary>
+  <summary xml:lang="id">Ambil foto dan video</summary>
+  <summary xml:lang="it">Acquisisce foto e video</summary>
+  <summary xml:lang="ko">사진 및 동영상 촬영</summary>
+  <summary xml:lang="nl">Neemt foto's en video's</summary>
+  <summary xml:lang="nn">Ta bilete og videoar</summary>
+  <summary xml:lang="pa">ਫੋਟੋ ਖਿੱਚੋ ਤੇ ਵੀਡੀਓ ਬਣਾਓ</summary>
+  <summary xml:lang="pl">Rób zdjęcia i filmy</summary>
+  <summary xml:lang="pt">Tire fotografias e grave vídeos</summary>
+  <summary xml:lang="pt-BR">Tire fotos e grave vídeos</summary>
+  <summary xml:lang="ro">Înregistrează poze și video</summary>
+  <summary xml:lang="ru">Создание фотографий и запись видео</summary>
+  <summary xml:lang="sk">Tvorba fotiek a videa</summary>
+  <summary xml:lang="sl">Zajem fotografij in videov</summary>
+  <summary xml:lang="sv">Ta foton och spela in videor</summary>
+  <summary xml:lang="tg">Суратҳо ва видеоҳоро ба навор гиред</summary>
+  <summary xml:lang="uk">Програма для створення фотографій і відео</summary>
+  <summary xml:lang="x-test">xxTake photos and videosxx</summary>
+  <summary xml:lang="zh-TW">拍照或錄影</summary>
+  <summary xml:lang="zh-CN">相机</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <developer_name>KDE Community</developer_name>
+  <developer_name xml:lang="az">KDE Cəımiyyəti</developer_name>
+  <developer_name xml:lang="ca">La comunitat KDE</developer_name>
+  <developer_name xml:lang="ca-valencia">La comunitat KDE</developer_name>
+  <developer_name xml:lang="cs">Komunita KDE</developer_name>
+  <developer_name xml:lang="da">KDE-fællesskabet</developer_name>
+  <developer_name xml:lang="de">KDE-Gemeinschaft</developer_name>
+  <developer_name xml:lang="el">Κοινότητα του KDE</developer_name>
+  <developer_name xml:lang="en-GB">KDE Community</developer_name>
+  <developer_name xml:lang="es">Comunidad KDE</developer_name>
+  <developer_name xml:lang="et">KDE kogukond</developer_name>
+  <developer_name xml:lang="eu">KDE komunitatea</developer_name>
+  <developer_name xml:lang="fi">KDE-yhteisö</developer_name>
+  <developer_name xml:lang="fr">La communauté KDE</developer_name>
+  <developer_name xml:lang="gl">Comunidade KDE</developer_name>
+  <developer_name xml:lang="hu">A KDE Közösség</developer_name>
+  <developer_name xml:lang="id">Komunitas KDE</developer_name>
+  <developer_name xml:lang="it">Comunità KDE</developer_name>
+  <developer_name xml:lang="ko">KDE 커뮤니티</developer_name>
+  <developer_name xml:lang="nl">KDE gemeenschap</developer_name>
+  <developer_name xml:lang="nn">KDE-fellesskapet</developer_name>
+  <developer_name xml:lang="pa">ਕੇਡੀਈ ਕਮਿਊਨਟੀ</developer_name>
+  <developer_name xml:lang="pl">Społeczność KDE</developer_name>
+  <developer_name xml:lang="pt">Comunidade do KDE</developer_name>
+  <developer_name xml:lang="pt-BR">KDE Community</developer_name>
+  <developer_name xml:lang="ro">Comunitatea KDE</developer_name>
+  <developer_name xml:lang="ru">Сообщество KDE</developer_name>
+  <developer_name xml:lang="sk">KDE komunita</developer_name>
+  <developer_name xml:lang="sl">Skupnost KDE</developer_name>
+  <developer_name xml:lang="sv">KDE-gemenskapen</developer_name>
+  <developer_name xml:lang="tg">Ҷамъияти KDE</developer_name>
+  <developer_name xml:lang="uk">Спільнота KDE</developer_name>
+  <developer_name xml:lang="x-test">xxKDE Communityxx</developer_name>
+  <developer_name xml:lang="zh-TW">KDE 社群</developer_name>
+  <description>
+    <p>Camera Application for Plasma Mobile.</p>
+    <p xml:lang="az">Plasma Mobile üçün kamera tətbiqi.</p>
+    <p xml:lang="ca">Aplicació de càmera per al Plasma mòbil.</p>
+    <p xml:lang="ca-valencia">Aplicació de càmera per al Plasma mòbil.</p>
+    <p xml:lang="da">Kameraprogram til Plasma Mobile.</p>
+    <p xml:lang="de">Kamera-Anwendung für Plasma Mobile.</p>
+    <p xml:lang="el">Εφαρμογή κάμερας για το Plasma Mobile.</p>
+    <p xml:lang="en-GB">Camera Application for Plasma Mobile.</p>
+    <p xml:lang="es">Aplicación de cámara para Plasma Mobile.</p>
+    <p xml:lang="et">Plasma Mobile kaamerarakendus</p>
+    <p xml:lang="eu">Plasma Mugikorrerako kamera aplikazioa</p>
+    <p xml:lang="fi">Kamerasovellus Plasma Mobileen.</p>
+    <p xml:lang="fr">Application caméra pour Plasma Mobile.</p>
+    <p xml:lang="gl">Aplicación de cámara para Plasma Mobile.</p>
+    <p xml:lang="hu">Kameraalkalmazás a Plasma Mobile-hoz.</p>
+    <p xml:lang="id">Aplikasi Kamera untuk Plasma Mobile.</p>
+    <p xml:lang="it">Applicazione per la fotocamera per Plasma Mobile.</p>
+    <p xml:lang="ko">Plasma 모바일용 카메라 애플리케이션.</p>
+    <p xml:lang="nl">Camera-Toepassing voor Plasma Mobile.</p>
+    <p xml:lang="nn">Kameraprogram for Plasma Mobile.</p>
+    <p xml:lang="pa">ਪਲਾਜ਼ਮਾ ਮੋਬਾਈਲ ਲਈ ਕੈਮਰਾ ਐਪਲੀਕੇਸ਼ਨ ਹੈ।</p>
+    <p xml:lang="pl">Aplikacja kamery dla Plazma Mobile.</p>
+    <p xml:lang="pt">Aplicação de Câmara para o Plasma Mobile.</p>
+    <p xml:lang="pt-BR">Aplicativo de câmera para o Plasma Mobile.</p>
+    <p xml:lang="ro">Aplicație de aparat foto pentru Plasma Mobile.</p>
+    <p xml:lang="ru">Приложение для работы с камерой для Plasma.</p>
+    <p xml:lang="sk">Aplikácia Camera pre Plasma Mobile</p>
+    <p xml:lang="sl">Progam za kamero za Plasma Mobile.</p>
+    <p xml:lang="sv">Kameraprogram för Plasma Mobil</p>
+    <p xml:lang="tg">Барномаи камера барои Плазмаи мобилӣ.</p>
+    <p xml:lang="uk">Програма-фотоапарат для мобільної Плазми.</p>
+    <p xml:lang="x-test">xxCamera Application for Plasma Mobile.xx</p>
+    <p xml:lang="zh-TW">適用於 Plasma Mobile 的相機應用程式。</p>
+    <p>It supports different resolutions, different white balance modes and switching between different camera devices.</p>
+    <p xml:lang="az">O, müxtəlif təsvir imkanları, müxtəlif bəyazlıq balansı və müxtəlif kameralar arası keçidi dəstəkləyir.</p>
+    <p xml:lang="ca">Permet resolucions diferents, modes diferents per al balanç de blancs i commutar entre dispositius de càmera diferents.</p>
+    <p xml:lang="ca-valencia">Permet resolucions diferents, modes diferents per al balanç de blancs i commutar entre dispositius de càmera diferents.</p>
+    <p xml:lang="da">Det understøtter forskellige opløsninger, forskellige hvidbalancetilstande og skift mellem forskellige kameraenheder.</p>
+    <p xml:lang="el">Υποστηρίζει διαφορετικές αναλύσεις, διαφορετικές λειτουργίες ισορροπιας λευκού και εναλλαγή μεταξύ διαφορετικών συσκευών φωτογραφικής μηχανής.</p>
+    <p xml:lang="en-GB">It supports different resolutions, different white balance modes and switching between different camera devices.</p>
+    <p xml:lang="es">Permite diferentes resoluciones, distintos modos de balance de blancos y cambiar entre distintos dispositivos de cámara.</p>
+    <p xml:lang="et">See toetab erinevaid eraldusvõimeid, erinevaid värvustasakaalu režiime ja lülitumist eri kaameraseadmete vahel.</p>
+    <p xml:lang="eu">Bereizmen ezberdinak onartzen ditu, zuri-balantze ezberdinak eta kamera-gailu ezberdinen artean aldatzea.</p>
+    <p xml:lang="fi">Tukee eri tarkkuuksia, valkotasapainotiloja ja vaihtamista eri kameralaitteiden välillä.</p>
+    <p xml:lang="fr">Elle prend en charge différentes résolutions, différents modes de balance des blancs et le basculement entre plusieurs caméras.</p>
+    <p xml:lang="gl">Permite varias resolucións, distintos modos de equilibrio de blancos e cambiar entre distintos dispositivos de cámara.</p>
+    <p xml:lang="hu">Támogat különböző felbontásokat, fehéregyensúly módokat és kameraeszközök közötti váltást.</p>
+    <p xml:lang="id">Ini mendukung resolusi yang berbeda, mode keseimbangan putih yang berbeda dan peralihan antara perangkat kamera yang berbeda.</p>
+    <p xml:lang="it">Supporta varie risoluzioni, varie modalità di bilanciamento del bianco e il passaggio alle diverse fotocamere dei dispositivi.</p>
+    <p xml:lang="ko">다양한 해상도, 다양한 화이트 밸런스 모드 및 서로 다른 카메라 장치 간의 전환을 지원합니다.</p>
+    <p xml:lang="nl">Het ondersteunt verschillende resoluties, verschillende modi witbalans en omschakelen tussen verschillende camera-apparaten.</p>
+    <p xml:lang="nn">Støttar ulike oppløysingar, kvitbalansemetodar og byte mellom ulike kameraeiningar.</p>
+    <p xml:lang="pa">ਇਹ ਵੱਖੋ-ਵੱਖ ਰੋਜ਼ੂਲੇਸ਼ਨ, ਵੱਖੋ-ਵੱਖ ਵਾਈਟ ਬੈਲਨਸ ਢੰਗ ਤੇ ਵੱਖੋ-ਵੱਖ ਕੈਮਰਾ ਡਿਵਾਈਸਾਂ ਵਿਚਾਲੇ ਬਦਲਣ ਲਈ ਸਹਾਇਕ ਹੈ।</p>
+    <p xml:lang="pl">Obsługuje wiele rozdzielczości, różne tryby równowagi bieli i przełączanie pomiędzy urządzeniami kamery.</p>
+    <p xml:lang="pt">Suporta diferentes resoluções, diferentes modos de balanceamento de branco e mudança entre diferentes dispositivos de câmaras.</p>
+    <p xml:lang="pt-BR">Tem suporte a diferentes resoluções, diferentes modos de balanceamento de branco e alternância entre diferentes dispositivos de câmeras.</p>
+    <p xml:lang="ro">Susține diverse rezoluții, regimuri diferite de balanțe de alb și schimbarea între diferite dispozitive fotografice.</p>
+    <p xml:lang="ru">Приложение поддерживает различные разрешения, выбор режима баланса белого и переключение между камерами.</p>
+    <p xml:lang="sk">Podporuje rôzne rozlíšenia, vyváženie bielej a prepínanie medzi rôznymi zariadeniami fotoaparátu.</p>
+    <p xml:lang="sl">Podpira različne ločljivosti, različne načine uravnoteževanje beline in preklapljanje med različnimi foto napravami.</p>
+    <p xml:lang="sv">Det stöder olika upplösningar, olika vitbalanslägen och byte mellan olika kameraenheter.</p>
+    <p xml:lang="tg">Барномаи ҷорӣ возеҳии экрани гуногун, реҷаҳои тавозуни сафеди гуногун ва мубодилаи камераҳоро байни дастгоҳҳои камераи гуногун дастгирӣ менамояд.</p>
+    <p xml:lang="uk">Передбачено підтримку різних роздільних здатностей, різних режимів балансу білого і перемикання між різними пристроями для створення зображень.</p>
+    <p xml:lang="x-test">xxIt supports different resolutions, different white balance modes and switching between different camera devices.xx</p>
+    <p xml:lang="zh-TW">此相機支援不同的解析度、白平衡模式，且允許切換成不同的相機裝置。</p>
+  </description>
+  <screenshots>
+    <screenshot>
+      <image>https://cdn.kde.org/screenshots/plasma-camera/plasma-camera.png</image>
+    </screenshot>
+  </screenshots>
+</component>

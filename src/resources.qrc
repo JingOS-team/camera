@@ -1,0 +1,39 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="main.qml">contents/ui/main.qml</file>
+        <file alias="GlobalDrawer.qml">contents/ui/GlobalDrawer.qml</file>
+        <file alias="CameraPage.qml">contents/ui/CameraPage.qml</file>
+        <file alias="AboutPage.qml">contents/ui/AboutPage.qml</file>
+        <file alias="ZoomControl.qml">contents/ui/ZoomControl.qml</file>
+        <file alias="PreviewArea.qml">contents/ui/PreviewArea.qml</file>
+        <file alias="FocusRing.qml">contents/ui/FocusRing.qml</file>
+        <file alias="BlurBackgroundView.qml">contents/ui/BlurBackgroundView.qml</file>
+        <file alias="CameraPageRight.qml">contents/ui/CameraPageRight.qml</file>
+        <file alias="BrightnessZoom.qml">contents/ui/BrightnessZoom.qml</file>
+    </qresource>
+    <qresource prefix="/assets">
+        <file alias="focus_ring.png">contents/ui/images/focus_ring.png</file>
+        <file alias="switch_camera.png">contents/ui/images/switch_camera.png</file>
+        <file alias="switch_flash.png">contents/ui/images/switch_flash.png</file>
+        <file alias="shutter1.png">contents/ui/images/shutter1.png</file>
+        <file alias="shutter.png">contents/ui/images/shutter.png</file>
+        <file alias="video.png">contents/ui/images/video.png</file>
+        <file alias="capture.png">contents/ui/images/capture.png</file>
+        <file alias="camera_flash_off.png">contents/ui/images/camera_flash_off.png</file>
+        <file alias="camera_camera_setting.png">contents/ui/images/camera_camera_setting.png</file>
+        <file alias="camera_auto_mode.png">contents/ui/images/camera_auto_mode.png</file>
+        <file alias="camera_white_balance_sunny.png">contents/ui/images/camera_white_balance_sunny.png</file>
+        <file alias="camera_white_balance_incandescent.png">contents/ui/images/camera_white_balance_incandescent.png</file>
+        <file alias="camera_flash_auto.png">contents/ui/images/camera_flash_auto.png</file>
+        <file alias="camera_flash_redeye.png">contents/ui/images/camera_flash_redeye.png</file>
+        <file alias="camera_white_balance_cloudy.png">contents/ui/images/camera_white_balance_cloudy.png</file>
+        <file alias="camera_white_balance_flourescent.png">contents/ui/images/camera_white_balance_flourescent.png</file>
+        <file alias="camera_flash_fill.png">contents/ui/images/camera_flash_fill.png</file>
+        <file alias="video_shutter1.png">contents/ui/images/video_shutter1.png</file>
+        <file alias="video_shutter.png">contents/ui/images/video_shutter.png</file>
+        <file alias="recording.png">contents/ui/images/recording.png</file>
+        <file alias="flash_on.png">contents/ui/images/flash_on.png</file>
+        <file alias="flash_off.png">contents/ui/images/flash_off.png</file>
+        <file alias="light.png">contents/ui/images/light.png</file>
+    </qresource>
+</RCC>

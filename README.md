@@ -17,8 +17,8 @@ Jing-Camera is based on plasma-camera [github](https://github.com/JingOS-team/pl
 
 ## Links
 - Home: [www.jingos.com](http://www.jingos.com/)
-- Project page: github.com/jingOS-team/jing-Camera
-- File issues: github.com/jingOS-team/jing-Camera/issues
+- Project page: https://github.com/JingOS-team/camera
+- File issues: https://github.com/JingOS-team/camera/issues
 - Development channel: [www.jingos.com](http://www.jingos.com/)
 
 ## Installing

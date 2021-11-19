@@ -1,0 +1,35 @@
+Source: plasma-camera
+Section: kde
+Priority: optional
+Build-Depends: cmake,
+               debhelper (>= 11),
+               extra-cmake-modules,
+               kirigami2-dev,
+               libkf5coreaddons-dev,
+               libkf5i18n-dev,
+               libqt5svg5-dev,
+               pkg-config,
+               pkg-kde-tools,
+               qtbase5-dev,
+               qtdeclarative5-dev,
+               qtquickcontrols2-5-dev,
+               libmediainfo-dev,
+               japp-sdk-qt-dev,
+               libkf5kio-dev
+Standards-Version: 4.3.0
+Homepage: https://phabricator.kde.org/source/plasma-camera/
+XSBC-Original-Maintainer: Boudewijn Rempt <boud@kde.org>
+Vcs-Git: https://anongit.neon.kde.org/mobile/plasma-camera
+Vcs-Browser: https://packaging.neon.kde.org/mobile/plasma-camera.git
+Maintainer: Neon CI <neon@kde.org>
+
+Package: plasma-camera
+Architecture: any
+Depends: qml-module-org-kde-kirigami2,
+         qml-module-qt-labs-settings,
+         qml-module-qtmultimedia,
+         qml-module-qtquick-controls2,
+         ${misc:Depends},
+         ${shlibs:Depends}
+Description: camera app for Plasma Mobile
+ Simple camera application for mobile devices.

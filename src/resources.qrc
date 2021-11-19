@@ -35,5 +35,8 @@
         <file alias="flash_on.png">contents/ui/images/flash_on.png</file>
         <file alias="flash_off.png">contents/ui/images/flash_off.png</file>
         <file alias="light.png">contents/ui/images/light.png</file>
+        <file alias="camera-shutter.oga">contents/ui/voice/camera-shutter.oga</file>
+        <file alias="pic.png">contents/ui/images/pic.png</file>
+        <file alias="camera-shutter.wav">contents/ui/voice/camera-shutter.wav</file>
     </qresource>
 </RCC>

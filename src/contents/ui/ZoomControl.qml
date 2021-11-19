@@ -3,6 +3,7 @@
 /****************************************************************************
 **
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
+**               2020 Zhang He Gang <zhanghegang@jingos.com>
 ** Contact: http://www.qt-project.org/legal
 **
 ** This file is part of the examples of the Qt Toolkit.
@@ -54,7 +55,6 @@ Item {
 
     signal zoomTo(real value)
 
-    //    visible: zoomControl.maximumZoom > 1
     onVisibleChanged: {
         if (visible && !hideTimer.running) {
             hideTimer.start()
@@ -65,6 +65,7 @@ Item {
         if (hideTimer.running & isStop) {
             hideTimer.stop()
         } else {
+            hideTimer.stop()
             hideTimer.start()
         }
     }
@@ -82,7 +83,7 @@ Item {
         color: "transparent"
         anchors {
             bottom: sliderView.top
-            bottomMargin: 10 * appScaleSize //root.height * 20/root.defaultHeight
+            bottomMargin: 10 * appScaleSize
             horizontalCenter: parent.horizontalCenter
         }
 
@@ -98,8 +99,8 @@ Item {
         Text {
             id: maxText
             anchors.centerIn: parent
-            text: qsTr("10X")
-            font.pixelSize: defaultFontSize - 4 //root.defaultFontSize-3
+            text: qsTr(maximumZoom + "X")
+            font.pixelSize: (defaultFontSize - 4) * appFontSize
             color: "white"
         }
     }
@@ -116,7 +117,6 @@ Item {
         }
         width: zoomControl.width
         height: zoomControl.height / 3
-        //        rotation: 270
         orientation: Qt.Vertical
         from: minimumZoom
         to: maximumZoom
@@ -146,13 +146,14 @@ Item {
                * (sliderView.availableHeight - height)
             color: "#FFFFFF"
             border.width: 0
-            implicitWidth: minCircle - 3
-            implicitHeight: minCircle - 3
+            implicitWidth: minCircle - 3 * appScaleSize
+            implicitHeight: minCircle - 3 * appScaleSize
             radius: height / 2
         }
 
         onMoved: {
             zoomControl.zoomTo(value)
+            managerTimer(false)
         }
         onHoveredChanged: {
             managerTimer(hovered)
@@ -166,7 +167,7 @@ Item {
         color: "transparent"
         anchors {
             top: sliderView.bottom
-            topMargin: 10 * appScaleSize //root.height * 20/root.defaultHeight
+            topMargin: 10 * appScaleSize
             horizontalCenter: parent.horizontalCenter
         }
         BlurBackgroundView {
@@ -181,7 +182,7 @@ Item {
             id: miniText
             anchors.centerIn: parent
             text: qsTr("1X")
-            font.pixelSize: defaultFontSize - 4 //root.defaultFontSize-3
+            font.pixelSize: (defaultFontSize - 4) * appFontSize
             color: "white"
         }
     }

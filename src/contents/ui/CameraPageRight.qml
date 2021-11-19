@@ -1,9 +1,19 @@
+
+
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Zhang He Gang <zhanghegang@jingos.com>
+ *
+ */
 import QtQuick 2.0
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.12
-import QtMultimedia 5.8
+import QtMultimedia 5.15
 
-Column {
+Rectangle {
+
     id: cameraPageRight
 
     property string previewUrl: "qrc:/assets/camera_white_balance_sunny.png"
@@ -18,6 +28,7 @@ Column {
     property bool currentModeCamera: true
     property bool isCameraRecoding
     property bool isSwitchCamera
+    property bool isFrontCamera: camera.position === Camera.FrontFace
     property string videoShutterUrl: "qrc:/assets/video_shutter.png"
     property string recordingUrl: "qrc:/assets/recording.png"
     property string captureShutterUrl: "qrc:/assets/shutter.png"
@@ -29,10 +40,13 @@ Column {
     property int minCircle: 32 * appScaleSize
     property int minImageWidth: 22 * appScaleSize
     property int maxCircle: 50 * appScaleSize
+    property var flashUrlArray: [flashOffUrl, flashAutoUrl, flashOnUrl]
+    property bool isSaveCaptureImage: false
+    property var flashModeCache
 
     signal previewClicked
     signal switchCameraClicked
-    signal flashViewClicked
+    signal flashViewClicked(var flashImageUrl)
     signal flutterViewClicked
     signal focusLengthClicked
     signal focusLengthLongClicked
@@ -40,11 +54,12 @@ Column {
     signal videoViewClicked
 
     onPreviewUrlChanged: {
-
+        previewAnima.running = true
     }
 
     Component.onCompleted: {
         imageCapture.imageSaved.connect(imageCapturePath)
+        imageCapture.captureFailed.connect(imageCaptureFailed)
         videoRecorder.recorderStatusChanged.connect(createVideoThumbnail)
         CameraUtils.videoPreviewChanged.connect(videoThumbnailCompleted)
     }
@@ -54,6 +69,11 @@ Column {
     }
     function imageCapturePath(requestId, path) {
         previewUrl = "file://" + path
+        isSaveCaptureImage = false
+    }
+
+    function imageCaptureFailed(requestId, message) {
+        isSaveCaptureImage = false
     }
 
     function setPhotoPreview() {
@@ -72,341 +92,486 @@ Column {
         }
     }
 
-    spacing: width / 2
+    function resetUiStatus() {
+        if (flashLeftView.modelCount !== 1) {
+            flashLeftView.modelCount = 1
+        }
+    }
 
-    Item {
-        id: previewView
+    function startPlayVoice() {
+        if (playSoundShutter.hasAudio) {
+            playSoundShutter.play()
+        }
+    }
 
+    color: "#00ffffff"
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+
+        }
+    }
+
+    Audio {
+        id: playSoundShutter
+        source: "qrc:/assets/camera-shutter.wav" //"file:///usr/share/sounds/freedesktop/stereo/camera-shutter.oga"
+        onStatusChanged: {
+            console.log(" sound status:::" + status + " error:" + errorString)
+        }
+    }
+
+    Timer {
+        id: flutterTimer
+        interval: 1000
+        onTriggered: {
+            isSaveCaptureImage = false
+        }
+    }
+
+    Column {
         anchors {
-            horizontalCenter: parent.horizontalCenter
+            right: parent.right
+            verticalCenter: parent.verticalCenter
+            rightMargin: 20 * appScaleSize
         }
-        width: maxCircle
-        height: width
-        clip: true
+        width: parent.width
+        spacing: isFrontCamera ? 76 * appHeightScaleSize : 35 * appHeightScaleSize
 
-        BlurBackgroundView {
-            anchors.fill: parent
-            blurSourceView: viewfinder
-            parentView: cameraPageRight
-            blurX: previewView.x
-            blurY: previewView.y
-        }
-        Image {
-            id: previewImage
-            anchors.centerIn: parent
-            source: previewUrl
-            sourceSize: Qt.size(previewView.width, previewView.height)
-            asynchronous: true
-            cache: false
-            visible: false
-            fillMode: Image.PreserveAspectFit
-        }
-        Rectangle {
-            id: imagemaskRect
-            //            anchors.fill:parent
-            anchors.centerIn: parent
-            width: parent.width - 2 * appScaleSize
+        Item {
+            id: previewView
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+            }
+            width: maxCircle
             height: width
-            radius: width / 2
-            visible: false
             clip: true
-        }
-        OpacityMask {
-            id: imageMask
-            anchors.fill: imagemaskRect
-            anchors.centerIn: parent
-            source: previewImage
-            maskSource: imagemaskRect
-        }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                var matchJpg = CameraUtils.lastCameraFilePath.search(".jpg")
-                Qt.openUrlExternally(CameraUtils.lastCameraFilePath)
-                //                if (matchJpg === null) {
-                //                    Qt.openUrlExternally(videoRecorder.actualLocation)
-                //                }
-                //                else {
-                //                    Qt.openUrlExternally("file://" + imageCapture.capturedImagePath)
-                //                }
-                previewClicked()
+            BlurBackgroundView {
+                anchors.fill: parent
+                blurSourceView: viewfinder
+                parentView: cameraPageRight
+                blurX: previewView.x
+                blurY: previewView.y
+                visible: imageMask.visible
             }
-        }
-    }
 
-    Item {
-        id: switchCamera
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: minCircle //root.width * 64/root.defaultWidth
-        height: width
-
-        BlurBackgroundView {
-            anchors.fill: parent
-            blurSourceView: viewfinder
-            parentView: cameraPageRight
-            blurX: switchCamera.x
-            blurY: switchCamera.y
-            backColor: isSwitchCamera ? "#66FFFFFF" : "#993C3C43"
-        }
-        Image {
-            id: switchCameraImage
-            anchors.centerIn: parent
-            width: minImageWidth
-            height: width
-            source: switchCameraUrl
-            sourceSize: Qt.size(switchCamera.width, switchCamera.height)
-            asynchronous: true
-            cache: false
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (isSwitchCamera) {
-                    switchCameraClicked()
-                } else {
-                    showPassiveNotification(i18n("switch camera fail"))
-                }
+            NumberAnimation {
+                id: previewAnima
+                target: imageMask
+                property: "scale"
+                from: 0.5
+                to: 1
+                duration: 250
+                easing.type: Easing.InOutQuad
             }
-        }
-    }
 
-    property var flashUrlArray: [flashOffUrl, flashAutoUrl, flashOnUrl]
-
-    Item {
-        id: falshView
-        property var supportModes: cameraFlash.supportedModes
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: minCircle //root.width * 64/root.defaultWidth
-        height: width
-
-        Component {
-            id: flashComponent
-
-            Item {
-                id: flashDelegate
-                width: minCircle //root.width * 64/root.defaultWidth
+            Image {
+                id: previewImage
+                anchors.centerIn: parent
+                width: previewView.width
+                height: previewView.height
+                source: previewUrl
+                asynchronous: true
+                antialiasing: true
+                cache: false
+                visible: false
+                fillMode: Image.PreserveAspectCrop
+            }
+            Rectangle {
+                id: imagemaskRect
+                anchors.centerIn: parent
+                width: parent.width - 2 * appScaleSize
                 height: width
-                BlurBackgroundView {
-                    anchors.fill: parent
-                    blurSourceView: viewfinder
-                    parentView: cameraPageRight
-                    blurX: flashDelegate.x
-                    blurY: flashDelegate.y
-                    backColor: flashLeftView.modelCount === 3 & index
-                               === 0 ? "#993C3C43" : (falshView.supportModes.length
-                                                      > 0 ? "#66FFFFFF" : "#993C3C43")
-                }
-                Image {
-                    id: falshImage
-                    anchors.centerIn: parent
-                    height: minImageWidth
-                    width: height
-                    source: flashUrlArray[index]
-                    sourceSize: Qt.size(falshView.width, falshView.height)
-                    asynchronous: true
-                    cache: false
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            var imageSource = falshImage.source.toString()
-                            switch (imageSource) {
-                            case flashAutoUrl:
-                                flashUrlArray = [flashAutoUrl, flashOnUrl, flashOffUrl]
-                                break
-                            case flashOnUrl:
-                                flashUrlArray = [flashOnUrl, flashAutoUrl, flashOffUrl]
-                                break
-                            case flashOffUrl:
-                                flashUrlArray = [flashOffUrl, flashAutoUrl, flashOnUrl]
-                                break
-                            }
-                            flashViewClicked()
-                        }
+                radius: width / 2
+                visible: false
+                clip: true
+            }
+            OpacityMask {
+                id: imageMask
+                anchors.fill: imagemaskRect
+                anchors.centerIn: parent
+                source: previewImage
+                antialiasing: true
+                maskSource: imagemaskRect
+                visible: !isCameraRecoding
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: !isCameraRecoding
+                onClicked: {
+                    resetUiStatus()
+                    flashModeCache = cameraFlash.mode
+                    if (cameraFlash.mode !== Camera.FlashOff) {
+                        cameraFlash.mode = Camera.FlashOff
+                    }
+                    if (imageMask.visible) {
+                        pushView()
+                        previewClicked()
                     }
                 }
             }
         }
 
-        Row {
-            id: flashLeftView
+        Item {
+            id: switchCamera
 
-            property int modelCount: 1
             anchors {
-                right: parent.right
+                horizontalCenter: parent.horizontalCenter
             }
-            width: parent.width * 3
-            height: parent.height
-            spacing: parent.width
-            layoutDirection: Qt.RightToLeft
+            width: minCircle
+            height: width
 
-            Repeater {
-                id: flashRepeater
-                model: flashLeftView.modelCount
-                delegate: flashComponent
+            BlurBackgroundView {
+                anchors.fill: parent
+                blurSourceView: viewfinder
+                parentView: cameraPageRight
+                blurX: switchCamera.x
+                blurY: switchCamera.y
+                backColor: isSwitchCamera ? "#66FFFFFF" : "#993C3C43"
+                visible: switchCameraImage.visible
             }
-            //            Image {
-            //                id: falshOnImage
-            //                source: flashViewUrl
-            //                sourceSize: Qt.size(falshView.width,falshView.height)
-            //                asynchronous: true
-            //                cache: false
-            //            }
-            //            Image {
-            //                id: falshOffImage
-            //                source: flashViewUrl
-            //                sourceSize: Qt.size(falshView.width,falshView.height)
-            //                asynchronous: true
-            //                cache: false
-            //            }
-        }
+            Image {
+                id: switchCameraImage
+                anchors.centerIn: parent
+                width: minImageWidth
+                height: width
+                source: switchCameraUrl
+                asynchronous: true
+                cache: false
+                visible: !isCameraRecoding
+            }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                if (falshView.supportModes.length > 0) {
-                    flashLeftView.modelCount = flashLeftView.modelCount !== 3 ? 3 : 1
-                    flashViewClicked()
+            MouseArea {
+                anchors.fill: parent
+                enabled: !isCameraRecoding
+                onClicked: {
+                    resetUiStatus()
+                    if (isSwitchCamera) {
+                        switchCameraClicked()
+                    }
                 }
             }
         }
-    }
 
-    Item {
-        id: flutterView
+        Item {
+            id: falshView
+            property var supportModes: cameraFlash.supportedModes
+            property var flashCurrentMode: cameraFlash.mode
 
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: maxCircle //parent.width//root.width/12
-        height: width
-        Image {
-            id: flutterImage
-            anchors.centerIn: parent
-            source: currentModeCamera ? captureShutterUrl : (isCameraRecoding ? recordingUrl : videoShutterUrl)
-            sourceSize: Qt.size(flutterView.width, flutterView.height)
-            asynchronous: true
-            cache: false
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                flutterViewClicked()
+            onFlashCurrentModeChanged: {
+                switch (flashCurrentMode) {
+                case Camera.FlashAuto:
+                    flashUrlArray = [flashAutoUrl, flashOnUrl, flashOffUrl]
+                    break
+                case Camera.FlashOn:
+                case Camera.FlashVideoLight:
+                    flashUrlArray = [flashOnUrl, flashAutoUrl, flashOffUrl]
+                    break
+                case Camera.FlashOff:
+                    flashUrlArray = [flashOffUrl, flashAutoUrl, flashOnUrl]
+                    break
+                }
             }
-        }
-    }
 
-    Item {
-        id: focusLenghtView
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: minCircle //root.width * 64/root.defaultWidth
-        height: width
-
-        BlurBackgroundView {
-            anchors.fill: parent
-            blurSourceView: viewfinder
-            parentView: cameraPageRight
-            blurX: focusLenghtView.x
-            blurY: focusLenghtView.y
-        }
-        Text {
-            id: focusLenghtImage
-            anchors.centerIn: parent
-            text: focusLengText
-            color: "white"
-            font.pixelSize: root.defaultFontSize - 4
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                focusLengthClicked()
+            anchors {
+                horizontalCenter: parent.horizontalCenter
             }
-            onPressAndHold: {
-                focusLengthLongClicked()
-            }
-        }
-    }
-
-    Item {
-        id: cameraView
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: minCircle //root.width * 64/root.defaultWidth
-        height: width
-
-        BlurBackgroundView {
-            anchors.fill: parent
-            blurSourceView: viewfinder
-            parentView: cameraPageRight
-            blurX: cameraView.x
-            blurY: cameraView.y
-            backColor: currentModeCamera ? "#993C3C43" : "#66FFFFFF"
-        }
-        Image {
-            id: cameraImage
-            anchors.centerIn: parent
-            width: minImageWidth
+            width: minCircle
             height: width
-            source: captureUrl
-            sourceSize: Qt.size(cameraView.width, cameraView.height)
-            asynchronous: true
-            cache: false
-        }
+            visible: !isFrontCamera
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                cameraViewClicked()
+            Component {
+                id: flashComponent
+
+                Item {
+                    id: flashDelegate
+                    width: minCircle
+                    height: width
+                    BlurBackgroundView {
+                        anchors.fill: parent
+                        blurSourceView: viewfinder
+                        parentView: cameraPageRight
+                        blurX: flashDelegate.x
+                        blurY: flashDelegate.y
+                        backColor: flashLeftView.modelCount === 3 & index
+                                   === 0 ? "#993C3C43" : (falshView.supportModes.length
+                                                          > 0 ? "#66FFFFFF" : "#993C3C43")
+                    }
+
+                    visible: getVisble()
+                    function getVisble() {
+                        var value = false
+
+                        if (currentModeCamera) {
+                            value = true
+                        } else if (falshImage.source != flashAutoUrl) {
+                            value = true
+                        } else {
+                            value = false
+                        }
+                        return value
+                    }
+                    Image {
+                        id: falshImage
+                        anchors.centerIn: parent
+                        height: minImageWidth
+                        width: height
+                        source: flashUrlArray[index]
+                        asynchronous: true
+                        cache: false
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                var imageSource = falshImage.source.toString()
+                                var flashStatus = 0
+                                switch (imageSource) {
+                                case flashAutoUrl:
+                                    flashStatus = 2
+                                    flashUrlArray = [flashAutoUrl, flashOnUrl, flashOffUrl]
+                                    break
+                                case flashOnUrl:
+                                    flashStatus = 1
+                                    flashUrlArray = [flashOnUrl, flashAutoUrl, flashOffUrl]
+                                    break
+                                case flashOffUrl:
+                                    flashStatus = 0
+                                    flashUrlArray = [flashOffUrl, flashAutoUrl, flashOnUrl]
+                                    break
+                                }
+                                flashViewClicked(imageSource)
+                                if (falshView.supportModes.length > 0) {
+                                    flashLeftView.stopTimer()
+                                    flashLeftView.modelCount
+                                            = flashLeftView.modelCount !== 3 ? 3 : 1
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Timer {
+                id: flashTimer
+                interval: 5000
+                onTriggered: {
+                    if (flashLeftView.modelCount !== 1) {
+                        flashLeftView.modelCount = 1
+                    }
+                }
+            }
+
+            Row {
+                id: flashLeftView
+
+                property int modelCount: 1
+                property bool timerRunning: true
+                anchors {
+                    right: parent.right
+                }
+                width: parent.width * 3
+                height: parent.height
+                spacing: parent.width
+                layoutDirection: Qt.RightToLeft
+                visible: {
+                    if (isFrontCamera) {
+                        return false
+                    }
+                    return !isCameraRecoding
+                }
+
+                function stopTimer() {
+                    if (flashTimer.running) {
+                        flashTimer.stop()
+                    }
+                }
+                Repeater {
+                    id: flashRepeater
+                    model: flashLeftView.modelCount
+                    delegate: flashComponent
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: flashLeftView.visible
+                onClicked: {
+                    if (falshView.supportModes.length > 0) {
+                        flashLeftView.modelCount = flashLeftView.modelCount !== 3 ? 3 : 1
+                    }
+                    if (flashLeftView.modelCount === 3) {
+                        flashTimer.start()
+                    } else {
+                        flashTimer.stop()
+                    }
+                }
             }
         }
-    }
 
-    Item {
-        id: videoView
+        Item {
+            id: flutterView
 
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-        }
-        width: minCircle //root.width * 64/root.defaultWidth
-        height: width
-
-        BlurBackgroundView {
-            anchors.fill: parent
-            blurSourceView: viewfinder
-            parentView: cameraPageRight
-            blurX: videoView.x
-            blurY: videoView.y
-            backColor: currentModeCamera ? "#66FFFFFF" : "#993C3C43"
-        }
-        Image {
-            id: videoImage
-            anchors.centerIn: parent
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+            }
+            width: maxCircle
             height: width
-            width: minImageWidth
-            source: videoUrl
-            sourceSize: Qt.size(videoView.width, videoView.height)
-            asynchronous: true
-            cache: false
+            Image {
+                id: flutterImage
+                anchors.centerIn: parent
+                width: flutterView.width
+                height: flutterView.height
+                antialiasing: true
+                source: currentModeCamera ? captureShutterUrl : (isCameraRecoding ? recordingUrl : videoShutterUrl)
+                asynchronous: true
+                cache: false
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    resetUiStatus()
+                    if (flutterTimer.running || switchLoader.active) {
+                        return
+                    }
+                    flutterTimer.start()
+                    playSoundShutter.stop()
+                    if (currentModeCamera) {
+                        if (isSaveCaptureImage) {
+                            return
+                        }
+                        isSaveCaptureImage = true
+                    }
+                    flutterViewClicked()
+                }
+            }
         }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                videoViewClicked()
+        Item {
+            id: focusLenghtView
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+            }
+            width: minCircle
+            height: width
+            visible: !isFrontCamera
+
+            BlurBackgroundView {
+                anchors.fill: parent
+                blurSourceView: viewfinder
+                parentView: cameraPageRight
+                blurX: focusLenghtView.x
+                blurY: focusLenghtView.y
+                visible: focusLenghtImage.visible
+            }
+            Text {
+                id: focusLenghtImage
+                anchors.centerIn: parent
+                text: focusLengText
+                color: "white"
+                font.pixelSize: (root.defaultFontSize - 4) * appFontSize
+
+                visible: {
+                    if (isFrontCamera) {
+                        return false
+                    }
+                    return !isCameraRecoding
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: focusLenghtImage.visible
+                onClicked: {
+                    resetUiStatus()
+                    focusLengthClicked()
+                }
+                onPressAndHold: {
+                    resetUiStatus()
+                    focusLengthLongClicked()
+                }
+            }
+        }
+
+        Item {
+            id: cameraView
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+            }
+            width: minCircle
+            height: width
+
+            BlurBackgroundView {
+                anchors.fill: parent
+                blurSourceView: viewfinder
+                parentView: cameraPageRight
+                blurX: cameraView.x
+                blurY: cameraView.y
+                backColor: currentModeCamera ? "#993C3C43" : "#66FFFFFF"
+                visible: !isCameraRecoding
+            }
+            Image {
+                id: cameraImage
+                anchors.centerIn: parent
+                width: minImageWidth
+                height: width
+                source: captureUrl
+                asynchronous: true
+                cache: false
+                visible: !isCameraRecoding
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: cameraImage.visible
+                onClicked: {
+                    resetUiStatus()
+                    cameraViewClicked()
+                }
+            }
+        }
+
+        Item {
+            id: videoView
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+            }
+            width: minCircle
+            height: width
+
+            BlurBackgroundView {
+                anchors.fill: parent
+                blurSourceView: viewfinder
+                parentView: cameraPageRight
+                blurX: videoView.x
+                blurY: videoView.y
+                backColor: currentModeCamera ? "#66FFFFFF" : "#993C3C43"
+                visible: !isCameraRecoding
+            }
+            Image {
+                id: videoImage
+                anchors.centerIn: parent
+                height: width
+                width: minImageWidth
+                source: videoUrl
+                asynchronous: true
+                cache: false
+                visible: !isCameraRecoding
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: videoImage.visible
+                onClicked: {
+                    resetUiStatus()
+                    videoViewClicked()
+                }
             }
         }
     }

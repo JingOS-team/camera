@@ -4,6 +4,7 @@
 **
 ** Copyright (C) 2018 Jonah Brüchert
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
+**               2020 Zhang He Gang <zhanghegang@jingos.com>
 ** Contact: http://www.qt-project.org/legal
 **
 ** $QT_BEGIN_LICENSE:BSD$
@@ -41,6 +42,9 @@
 import QtQuick 2.12
 import org.kde.kirigami 2.15 as Kirigami
 import QtMultimedia 5.8
+import QtQuick.Window 2.2
+import QtQuick.Controls 2.15
+import jingos.display 1.0
 
 import org.kde.plasmacamera 1.0
 
@@ -50,16 +54,65 @@ Kirigami.ApplicationWindow {
     property int defaultFontSize: 14 //theme.defaultFont.pointSize
     property int defaultWidth: 1920
     property int defaultHeight: 1200
-    property var appScaleSize: width / 888
+    property var appScaleSize: JDisplay.dp(1.0) //width / 888
+    property var appHeightScaleSize: JDisplay.dp(1.0) //height / 648
+    property var appFontSize: JDisplay.sp(1.0)
+    property var appActive
 
     width: root.screen.width
     height: root.screen.height
+    pageStack.interactive: false
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
+    visibility: Window.FullScreen
+
+    onActiveChanged: {
+        if (active) {
+            visibility = Window.FullScreen
+        }
+        appActive = active
+    }
 
     Component {
         id: aboutPage
+
         AboutPage {}
     }
-    pageStack.initialPage: CameraPage {
+
+    function pushView() {
+        CameraPhotosModel.loadCameraPath()
+        if (CameraPhotosModel.dataSize() <= 0) {
+            return
+        }
+        var lastIndex = CameraPhotosModel.dataSize() - 1
+        var previousObj = applicationWindow().pageStack.layers.push(
+                    cameraDetaileComponent, {
+                        "startIndex": lastIndex,
+                        "imagesModel": CameraPhotosModel,
+                        "imageDetailTitle": i18n("Camera")
+                    })
+        previousObj.close.connect(popView)
+        previousObj.deleteCurrentPicture.connect(previewPageDeletePicture)
+    }
+
+    function previewPageDeletePicture(index, path) {
+        CameraPhotosModel.removePhotoFile(index, path)
+    }
+
+    function popView() {
+        applicationWindow().pageStack.layers.pop()
+    }
+
+    pageStack.initialPage: Component {
+        id: mainComponent
+        CameraPage {
+            id: cameraPageView
+            width: root.width
+            height: root.height
+        }
+    }
+
+    Component {
+        id: cameraDetaileComponent
+        Kirigami.JImagePreviewItem {}
     }
 }

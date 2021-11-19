@@ -1,0 +1,42 @@
+plasma-camera (1.1) focal; urgency=medium
+
+  * Format version
+
+ -- JingOS CI <jingos@jingos.com>  Fri, 19 Nov 2021 16:02:21 +0800
+
+plasma-camera (1.0-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Jonah Brüchert <jbb@kaidan.im>  Sun, 09 Jun 2019 21:03:44 +0200
+
+plasma-camera (0.0.1+git20190608-1) unstable; urgency=medium
+
+  * New snapshot
+
+ -- Jonah Brüchert <jbb@kaidan.im>  Sat, 08 Jun 2019 01:23:39 +0200
+
+plasma-camera (0.0.1+git20190403-1) unstable; urgency=medium
+
+  * New snapshot
+
+ -- Jonah Brüchert <jbb@kaidan.im>  Wed, 03 Apr 2019 15:35:24 +0200
+
+plasma-camera (0.0.1ubuntu2-0ubuntu1) vivid; urgency=medium
+
+  * New snapshot
+
+ -- Jonathan Riddell <jriddell@ubuntu.com>  Fri, 12 Jun 2015 06:13:15 +0200
+
+plasma-camera (0.0.1ubuntu1) vivid; urgency=medium
+
+  * Add dep 
+
+ -- Boudewijn Rempt <boud@kde.org>  Fri, 05 Jun 2015 08:13:59 +0000
+
+plasma-camera (0.0.1) vivid; urgency=medium
+
+  * Initial release. 
+
+ -- Boudewijn Rempt <boud@kde.org>  Wed, 05 June 2015 09:50:41 +0000
+ 

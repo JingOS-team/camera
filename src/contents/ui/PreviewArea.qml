@@ -1,13 +1,15 @@
-
 // SPDX-FileCopyrightText: 2020 Jonah Brüchert <jbb@kaidan.im>
 // SPDX-FileCopyrightText: 2020 Sebastian Pettke <sebpe@mailbox.org>
+//
 // SPDX-License-Identifier: GPL-3.0-or-later
+
 import QtQuick 2.7
 import QtMultimedia 5.8
 import QtQuick.Controls.Material 2.0
 import QtQuick.Controls 2.0 as Controls
 import org.kde.kirigami 2.15 as Kirigami
 import QtGraphicalEffects 1.0
+
 
 Rectangle {
     id: preview
@@ -17,9 +19,7 @@ Rectangle {
     property bool showVideoPreview: false // when set to true, the preview for the videoRecorder is shown, if false for the imageCapture
     property bool videoThumbnailRequested: false
 
-    visible: ((imageCapture.capturedImagePath && !showVideoPreview)
-              || (videoRecorder.actualLocation && showVideoPreview))
-             && !(videoRecorder.recorderStatus === CameraRecorder.RecordingStatus)
+    visible: ((imageCapture.capturedImagePath && !showVideoPreview) || (videoRecorder.actualLocation && showVideoPreview)) && !(videoRecorder.recorderStatus === CameraRecorder.RecordingStatus)
     width: Kirigami.Units.gridUnit * 6
     height: width
     layer.enabled: preview.enabled
@@ -43,8 +43,7 @@ Rectangle {
     }
 
     function createVideoThumbnail() {
-        if (videoThumbnailRequested
-                && !(videoRecorder.recorderStatus === CameraRecorder.FinalizingStatus)) {
+        if (videoThumbnailRequested && !(videoRecorder.recorderStatus === CameraRecorder.FinalizingStatus)) {
             video.source = videoRecorder.actualLocation
             video.play()
             video.pause()
@@ -57,7 +56,8 @@ Rectangle {
         onClicked: {
             if (showVideoPreview) {
                 Qt.openUrlExternally(videoRecorder.actualLocation)
-            } else {
+            }
+            else {
                 Qt.openUrlExternally("file://" + imageCapture.capturedImagePath)
             }
         }

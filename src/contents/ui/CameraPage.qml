@@ -4,6 +4,7 @@
 **
 ** Copyright (C) 2018 Jonah Brüchert
 ** Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies).
+**               2020 Zhang He Gang <zhanghegang@jingos.com>
 ** Contact: http://www.qt-project.org/legal
 **
 ** $QT_BEGIN_LICENSE:BSD$
@@ -51,6 +52,7 @@ Kirigami.Page {
     id: cameraPage
 
     property var camera: mainCamera
+    property var pageActive: root.appActive
 
     title: i18n("Camera")
 
@@ -62,6 +64,49 @@ Kirigami.Page {
     globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None //Kirigami.Settings.isMobile ? Kirigami.ApplicationHeaderStyle.None : Kirigami.ApplicationHeaderStyle.ToolBar
     onIsCurrentPageChanged: isCurrentPage && pageStack.depth > 1
                             && pageStack.pop()
+
+    Connections {
+        target: CameraUtils
+        onQuitApp: {
+            console.log("onQuitApp ing....isRecorder:"
+                        + (camera.videoRecorder.recorderStatus === CameraRecorder.RecordingStatus))
+            if (camera.videoRecorder.recorderStatus === CameraRecorder.RecordingStatus) {
+                cameraRight.setVideoPreview()
+                camera.videoRecorder.stop()
+            }
+        }
+
+        onPauseApp: {
+            console.log("onpauseapp:")
+            if (camera.flash.mode !== Camera.FlashOff && mainCamera.captureMode !== Camera.CaptureStillImage) {
+                camera.flash.mode = Camera.FlashOff
+            }
+            if (camera.videoRecorder.recorderStatus === CameraRecorder.RecordingStatus) {
+                cameraRight.setVideoPreview()
+                camera.videoRecorder.stop()
+            }
+        }
+        function onError(error) {
+            console.warn("Error on the CameraUtils", error)
+        }
+    }
+
+    onPageActiveChanged: {
+        console.log(" active changed::" + pageActive)
+        if (pageActive) {
+            cameraRight.previewUrl = CameraUtils.lastCameraPreviewPath
+            camera.start()
+            camera.autoFocus()
+        } else {
+            CameraUtils.requestDbusWakeup(false)
+            if (camera.videoRecorder.recorderStatus === CameraRecorder.RecordingStatus) {
+                cameraRight.setVideoPreview()
+                camera.videoRecorder.stop()
+            }
+            camera.stop()
+        }
+    }
+
     Rectangle {
         id: cameraUI
         state: "PhotoCapture"
@@ -72,6 +117,20 @@ Kirigami.Page {
         }
 
         color: "black"
+
+        onVisibleChanged: {
+            console.log(" camera ui visible:::" + visible)
+            if (visible) {
+                cameraRight.previewUrl = CameraUtils.lastCameraPreviewPath
+                if (cameraRight.flashModeCache !== -1) {
+                    camera.flash.mode = cameraRight.flashModeCache
+                    cameraRight.flashModeCache = -1
+                }
+                CameraUtils.setDistanceValue(1)
+            } else {
+                CameraUtils.setDistanceValue(40)
+            }
+        }
 
         states: [
             State {
@@ -117,7 +176,14 @@ Kirigami.Page {
             property double brightnessValue: 0.0 //li
             property var supportResolutions: mainCamera.imageCapture.supportedResolutions
             property var currentResolution: Qt.size(1280, 720)
+            property bool isSwitched: false
+            property alias currentCaptureMode: mainCamera.captureMode
 
+            onCurrentCaptureModeChanged: {
+                if (currentCaptureMode === Camera.CaptureStillImage) {
+                    CameraUtils.requestDbusWakeup(false)
+                }
+            }
             function manualFocus(x, y) {
                 var normalizedPoint = viewfinder.mapPointToSourceNormalized(
                             Qt.point(x, y - viewfinder.y))
@@ -125,6 +191,9 @@ Kirigami.Page {
                         && normalizedPoint.y >= 0.0
                         && normalizedPoint.y <= 1.0) {
                     focusRingView.center = Qt.point(x, y)
+                    //default brightness value
+                    mainCamera.brightnessValue = 0
+                    cameraPagebrightnessZoom.mSlideValue = 1
                     focusRingView.show()
                     autoFocusTimer.restart()
                     cFocus.focusMode = Camera.FocusAuto
@@ -143,15 +212,16 @@ Kirigami.Page {
                 onTriggered: camera.autoFocus()
             }
 
-            onCameraStateChanged: {
-                if (cameraState === Camera.ActiveState) {
+            Component.onCompleted: {
+                autoFocus()
+            }
 
-                }
+            onCameraStateChanged: {
             }
 
             onCameraStatusChanged: {
-                if (cameraStatus === Camera.ActiveStatus) {
-
+                if (cameraStatus === Camera.ActiveStatus & switchLoader.active) {
+                    loadSwitchView()
                 }
             }
 
@@ -159,26 +229,23 @@ Kirigami.Page {
             deviceId: CameraSettings.cameraDeviceId
             flash {
                 id: cFlash
-                mode: Camera.FlashAuto
+                mode: Camera.FlashOff
             }
             focus {
                 id: cFocus
                 focusMode: Camera.FocusContinuous
                 focusPointMode: Camera.FocusPointAuto
-                //                customFocusPoint: Qt.point(0.5, 0.5) // Focus relative to top-left corner
             }
             imageCapture {
                 id: imageCapture
-                //                capturedImagePath: CameraUtils.cameraDefaultPath
-                //                resolution: mainCamera.currentResolution//CameraSettings.resolution
             }
 
             videoRecorder {
                 id: videoRecorder
-               }
+            }
             imageProcessing {
                 id: imageProcessing
-                whiteBalanceMode: CameraSettings.whiteBalanceMode
+                whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto //CameraSettings.whiteBalanceMode
                 brightness: mainCamera.brightnessValue
             }
 
@@ -191,47 +258,78 @@ Kirigami.Page {
 
         VideoOutput {
             id: viewfinder
-            visible: cameraUI.state == "PhotoCapture"
-                     || cameraUI.state == "VideoCapture"
-
+            visible: cameraUI.state == "PhotoCapture" || cameraUI.state == "VideoCapture"
             // Workaround
-            //            orientation: Kirigami.Settings.isMobile ? -90 : 0
             anchors.fill: parent
             fillMode: VideoOutput.PreserveAspectCrop //fill screen
             flushMode: VideoOutput.LastFrame //fix black screen
-            source: mainCamera //cameraPage.camera
+            source: mainCamera
         }
 
         PinchArea {
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: parent.width - 80
+            height: parent.height - 80
             property real initialZoom
             property real minimumScale: 0.3
             property real maximumScale: 3.0
             property bool active: false
+            enabled: camera.position !== Camera.FrontFace
 
             onPinchStarted: {
                 active = true
                 initialZoom = cameraPage.camera.digitalZoom
             }
             onPinchUpdated: {
-                var scale = cameraPage.camera.maximumDigitalZoom / 8
-                        * pinch.scale - cameraPage.camera.maximumDigitalZoom / 8
-                cameraPage.camera.setDigitalZoom(
-                            Math.min(cameraPage.camera.maximumDigitalZoom,
-                                     cameraPage.camera.digitalZoom + scale))
+                var scale = cameraPage.camera.maximumDigitalZoom / 2
+                        * pinch.scale - cameraPage.camera.maximumDigitalZoom / 2
+                var dzValue = Math.min(cameraPage.camera.maximumDigitalZoom,
+                                       initialZoom + scale)
+                cameraPage.camera.setDigitalZoom(Math.max(dzValue, 1))
             }
             onPinchFinished: {
                 active = false
             }
             MouseArea {
                 anchors.fill: parent
+                property var startMouseY: 0
 
                 onClicked: {
+                }
+
+                function openFocusUi(mouse) {
                     mainCamera.manualFocus(mouse.x, mouse.y)
                     if (cameraPage.camera.lockStatus === cameraPage.camera.Unlocked) {
                         cameraPage.camera.searchAndLock()
                     } else {
                         cameraPage.camera.unlock()
+                    }
+                }
+
+                onPressed: {
+                    startMouseY = mouse.y
+                }
+
+                onReleased: {
+                    var offsetValue = mouse.y - startMouseY
+                    cameraRight.resetUiStatus()
+                    if (Math.abs(offsetValue) < 100) {
+                        openFocusUi(mouse)
+                    } else {
+                        if (cameraRight.isCameraRecoding) {
+                            return
+                        }
+                        if (offsetValue < 0) {
+                            if (camera.captureMode !== Camera.CaptureVideo) {
+                                loadSView()
+                                cameraRight.startSwitchMode(2)
+                            }
+                        } else {
+                            if (camera.captureMode !== Camera.CaptureStillImage) {
+                                loadSView()
+                                cameraRight.startSwitchMode(1)
+                            }
+                        }
                     }
                 }
             }
@@ -243,29 +341,87 @@ Kirigami.Page {
         visible: false
         anchors {
             left: parent.left
-            margins: Kirigami.Units.gridUnit * 2
+            margins: Kirigami.Units.gridUnit * 2 * appScaleSize
         }
-        width: Kirigami.Units.gridUnit * 2
+        width: Kirigami.Units.gridUnit * 2 * appScaleSize
         height: parent.height
         currentZoom: cameraPage.camera.digitalZoom
-        maximumZoom: cameraPage.camera.maximumDigitalZoom //Math.min(4.0, cameraPage.camera.maximumDigitalZoom)
+        maximumZoom: cameraPage.camera.maximumDigitalZoom
         onZoomTo: cameraPage.camera.setDigitalZoom(value)
+        onCurrentZoomChanged: {
+        }
+    }
+
+    Component {
+        id: switchComponent
+        Rectangle {
+            id: contentRect
+            property bool loadIsShow: switchLoader.active
+            color: "#000000"
+            width: cameraPage.width
+            height: cameraPage.height
+
+            onLoadIsShowChanged: {
+                if (loadIsShow) {
+                    contentViewAnima.from = 0
+                    contentViewAnima.to = 1.0
+                    contentViewAnima.start()
+                }
+            }
+            NumberAnimation {
+                id: contentViewAnima
+                target: contentRect
+                property: "opacity"
+                from: 0
+                to: 1.0
+                duration: 100
+                easing.type: Easing.InOutQuad
+            }
+        }
+    }
+
+    Timer {
+        id: switchTimer
+        interval: 500
+        onTriggered: {
+            switchLoader.active = false
+            camera.autoFocus()
+        }
+    }
+
+    Loader {
+        id: switchLoader
+        sourceComponent: switchComponent
+        active: true
+    }
+
+    function loadSwitchView() {
+        if (switchTimer.running) {
+            switchTimer.stop()
+        }
+        switchTimer.start()
+    }
+
+    function loadSView() {
+        focusRingView.hide()
+        camera.isSwitched = true
+        switchLoader.active = true
     }
 
     CameraPageRight {
         id: cameraRight
+        property bool rootActive: root.active
+        property int currentSwitchMode: 0
+
         anchors {
             right: parent.right
-            rightMargin: cameraRight.width / 2
             verticalCenter: parent.verticalCenter
         }
-        width: root.height / 12
-        height: parent.height * 3 / 4
+        width: 75 * appScaleSize
+        height: parent.height * 5 / 6
         //TODO update last preview
         previewUrl: CameraUtils.lastCameraPreviewPath
-        focusLengText: (Math.round(
-                            cameraPage.camera.digitalZoom * 10) / 10.0).toFixed(
-                           1) + "X"
+        focusLengText: (cameraPage.camera.digitalZoom !== 0 ? (Math.round(cameraPage.camera.digitalZoom * 10) / 10.0).toFixed(1) + "X" : "1.0X")
         videoRecorder: camera.videoRecorder
         imageCapture: camera.imageCapture
         isCameraRecoding: camera.videoRecorder.recorderStatus === CameraRecorder.RecordingStatus
@@ -273,9 +429,48 @@ Kirigami.Page {
         currentModeCamera: camera.captureMode === Camera.CaptureStillImage
 
         cameraFlash: camera.flash
+
+        onRootActiveChanged: {
+            if (rootActive) {
+                previewUrl = CameraUtils.lastCameraPreviewPath
+            }
+        }
+
+        onIsCameraRecodingChanged: {
+            CameraUtils.requestDbusWakeup(isCameraRecoding)
+        }
+
+        Timer {
+            id: switchCameraTimer
+            interval: 150
+            onTriggered: {
+                if (cameraRight.currentSwitchMode === 0) {
+                    camera.position = camera.position
+                            === Camera.FrontFace ? Camera.BackFace : Camera.FrontFace
+                } else if (cameraRight.currentSwitchMode === 1) {
+                    camera.captureMode = Camera.CaptureStillImage
+                    camera.flash.mode = Camera.FlashOff
+                } else if (cameraRight.currentSwitchMode === 2) {
+                    camera.captureMode = Camera.CaptureVideo
+                    camera.flash.mode = Camera.FlashOff
+                }
+            }
+        }
+
+        function startSwitchMode(switchMode) {
+            if (!switchCameraTimer.running) {
+                cameraRight.currentSwitchMode = switchMode
+                switchCameraTimer.start()
+            }
+        }
+
+        onPreviewClicked: {
+            mainCamera.brightnessValue = 0
+        }
         onSwitchCameraClicked: {
-            camera.position = camera.position
-                    === Camera.FrontFace ? Camera.BackFace : Camera.FrontFace
+            loadSView()
+            startSwitchMode(0)
+            autoFocus()
         }
 
         onFlutterViewClicked: {
@@ -294,23 +489,33 @@ Kirigami.Page {
 
         onCameraViewClicked: {
             if (camera.captureMode !== Camera.CaptureStillImage) {
-                camera.captureMode = Camera.CaptureStillImage
+                loadSView()
+                startSwitchMode(1)
             }
         }
 
         onVideoViewClicked: {
             if (camera.captureMode !== Camera.CaptureVideo) {
-                camera.captureMode = Camera.CaptureVideo
+                loadSView()
+                startSwitchMode(2)
             }
         }
 
         onFocusLengthClicked: {
-
+            cameraDigitalZoom.visible = !cameraDigitalZoom.visible
         }
 
-        onFocusLengthLongClicked: {
-            if (!cameraDigitalZoom.visible) {
-                cameraDigitalZoom.visible = true
+        onFlashViewClicked: {
+            switch (flashImageUrl) {
+            case flashAutoUrl:
+                camera.flash.mode = Camera.FlashAuto
+                break
+            case flashOnUrl:
+                camera.flash.mode = currentModeCamera ? Camera.FlashOn : Camera.FlashVideoLight
+                break
+            case flashOffUrl:
+                camera.flash.mode = Camera.FlashOff
+                break
             }
         }
     }
@@ -324,7 +529,7 @@ Kirigami.Page {
         property int recordingDurationSeconds: 0
 
         onTriggered: {
-            recordingDurationSeconds++
+            recordingDurationSeconds = camera.videoRecorder.duration / 1000
         }
 
         onRunningChanged: {
@@ -340,7 +545,6 @@ Kirigami.Page {
         spacing: 15 * appScaleSize
 
         anchors {
-            //            left: parent.left
             horizontalCenter: parent.horizontalCenter
             top: parent.top
             margins: root.height * 40 / root.defaultHeight
@@ -357,7 +561,6 @@ Kirigami.Page {
 
             Rectangle {
                 color: "#E95B4E"
-                //                anchors.centerIn: recordingBlur
                 x: (recordingBlur.width - width) / 2
                 y: (recordingBlur.height - height) / 2
                 radius: width / 2
@@ -384,7 +587,7 @@ Kirigami.Page {
                                % 60) < 10) ? "0" : "") + // zero padding
                             (recordingDurationTimer.recordingDurationSeconds % 60))
             }
-            font.pixelSize: root.defaultFontSize + 3
+            font.pixelSize: (root.defaultFontSize + 3) * appFontSize
             color: "white"
         }
     }
@@ -397,30 +600,25 @@ Kirigami.Page {
 
         onTriggered: {
             running = false
-
             if (camera.captureMode === Camera.CaptureStillImage) {
                 if (camera.imageCapture.ready) {
+                    cameraRight.startPlayVoice()
                     camera.imageCapture.captureToLocation(
                                 CameraUtils.cameraDefaultPath)
                     cameraRight.setPhotoPreview()
-                    //                    previewArea.setPhotoPreview()
-                    showPassiveNotification(i18n("Took a photo"))
                 } else {
-                    showPassiveNotification(i18n("Failed to take a photo"))
+                    cameraRight.isSaveCaptureImage = false
                 }
             } else if (camera.videoRecorder.recorderStatus === CameraRecorder.RecordingStatus) {
-                camera.videoRecorder.stop()
                 cameraRight.setVideoPreview()
-                //                previewArea.setVideoPreview()
-                showPassiveNotification(i18n("Stopped recording"))
+                camera.videoRecorder.stop()
             } else if (camera.captureMode === Camera.CaptureVideo) {
                 camera.videoRecorder.setOutputLocation(CameraUtils.videoPath)
                 camera.videoRecorder.record()
 
                 if (camera.videoRecorder.recorderStatus === CameraRecorder.RecordingStatus) {
-                    showPassiveNotification(i18n("Started recording"))
                 } else {
-                    showPassiveNotification(i18n("Failed to start recording"))
+                    console.log(" Failed to start recording")
                 }
             }
         }
@@ -460,7 +658,7 @@ Kirigami.Page {
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
-            margins: Kirigami.Units.gridUnit * 1
+            margins: Kirigami.Units.gridUnit * 1 * appScaleSize
         }
 
         Kirigami.Icon {
@@ -482,7 +680,7 @@ Kirigami.Page {
                     "%1 s".arg(camera.selfTimerDuration)
                 }
             }
-            font.pixelSize: defaultFontSize + 3
+            font.pixelSize: (defaultFontSize + 3) * appFontSize
             color: {
                 if (selfTimer.running) {
                     "red"
@@ -516,24 +714,36 @@ Kirigami.Page {
 
     BrightnessZoom {
         id: cameraPagebrightnessZoom
-        width: 176 * appScaleSize //root.width * 364/root.defaultWidth
+
+        width: 176 * appScaleSize
         height: 22 * appScaleSize
         anchors {
             top: focusRingView.bottom
             horizontalCenter: focusRingView.horizontalCenter
         }
-        visible: focusRingView.opacity === 1.0
+        visible: {
+            if (!cameraRight.isFrontCamera) {
+                return focusRingView.opacity === 1.0
+            } else {
+                return false
+            }
+        }
+
         onVisibleChanged: {
             if (visible) {
+                console.log(" bright current value:" + cameraPage.camera.imageProcessing.brightness
+                            + " mVisualPosition:" + mVisualPosition + " mSlideValue" + mSlideValue)
                 currentZoom = cameraPage.camera.imageProcessing.brightness + 1
+                mSlideValue = 1
             }
         }
         maximumZoom: 2.0
         onZoomTo: {
+            focusRingView.managerTimer(false)
             cameraPage.camera.brightnessValue = value - 1
         }
         onZoomHovered: {
-            focusRingView.managerTimer(hovered)
+            focusRingView.managerTimer(isHovered)
         }
     }
 
@@ -574,19 +784,6 @@ Kirigami.Page {
                 to: 0
                 duration: 500
             }
-        }
-    }
-
-    PreviewArea {
-        id: previewArea
-        imageCapture: camera.imageCapture
-        videoRecorder: camera.videoRecorder
-        visible: false
-
-        anchors {
-            right: parent.right
-            bottom: parent.bottom
-            margins: Kirigami.Units.gridUnit
         }
     }
 }

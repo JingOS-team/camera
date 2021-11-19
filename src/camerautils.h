@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2021 Beijing Jingling Information System Technology Co., Ltd. All rights reserved.
+ *
+ * Authors:
+ * Zhang He Gang <zhanghegang@jingos.com>
+ *
+ */
+
 #ifndef CAMERAUTILS_H
 #define CAMERAUTILS_H
 #include <QObject>
@@ -22,45 +30,40 @@ public:
     virtual ~CameraUtils();
     static CameraUtils *instance();
     Q_INVOKABLE void creatPreviewPic(QString path);
+    Q_INVOKABLE void openPhotoUrl(QString path);
+    Q_INVOKABLE void requestDbusWakeup(bool iswakup);
+    Q_INVOKABLE void setDistanceValue(int value);
 
-    QString cameraDefaultPath() {
-//        QString suffix = ".jpg";
-//        int cur = 0;
-//        QString newFilePath = cameraDefaultDirPath+"/IMG_";
-//        QFileInfo check(m_cameraDefaultPath);
-//        while (check.exists()) {
-//            m_cameraDefaultPath = QString("%1%2%3").arg(newFilePath, QString::number(cur), suffix);
-//            check = QFileInfo(m_cameraDefaultPath);
-//            cur++;
-//        }
+    QString cameraDefaultPath(){
+        QDir cameraDir(cameraDefaultDirPath);
+        bool isExists = cameraDir.exists();
+        if(!isExists){
+            bool isMkPath = cameraDir.mkpath(cameraDefaultDirPath);
+        }
         return cameraDefaultDirPath;
     }
 
-    QString videoPath() {
-//        QString suffix = ".mp4";
-//        int cur = 0;
-//        QString newFilePath = cameraDefaultDirPath+"/VIDEO_";
-//        QFileInfo check(m_videoPath);
-//        while (check.exists()) {
-//            m_videoPath = QString("%1%2%3").arg(newFilePath, QString::number(cur), suffix);
-//            check = QFileInfo(m_videoPath);
-//            cur++;
-//        }
+    QString videoPath(){
+        QDir cameraDir(cameraDefaultDirPath);
+        bool isExists = cameraDir.exists();
+        if(!isExists){
+            bool isMkPath = cameraDir.mkpath(cameraDefaultDirPath);
+        }
         return cameraDefaultDirPath;
     }
 
     QString lastCameraPreviewPath();
     QString lastCameraFilePath();
 
-    void setCameraDefaultPath(QString path) {
+    void setCameraDefaultPath(QString path){
         m_cameraDefaultPath = path;
         emit cameraDefaultPathChanged();
     }
 
-    QString videoPreview() {
+    QString videoPreview(){
         return m_path;
     }
-    void setVideoPreview(QString path) {
+    void setVideoPreview(QString path){
         m_path = path;
         emit videoPreviewChanged();
     }
@@ -69,6 +72,11 @@ private:
     QString m_cameraDefaultPath;
     QString m_videoPath;
     QString m_lastCameraPreviewPath;
+    QString m_thumbFilePath = QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation) + "/video_thumb";
+    uint m_nInhibitCookie;
+    bool m_nIsInhibiting = false;
+    int m_distanceValue = 0;
+
 public:
     QString cameraDefaultDirPath = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation) + "/camera";
 signals:
@@ -77,6 +85,8 @@ signals:
     void videoPathChanged();
     void lastCameraPreviewPathChanged();
     void lastCameraFilePathChanged();
+    void quitApp();
+    void pauseApp();
 
 protected Q_SLOTS:
     void gotPreviewed(const KFileItem &item, const QPixmap &preview);
